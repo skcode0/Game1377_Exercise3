@@ -6,7 +6,8 @@
  * Remember, asteroids should only spawn through the AsteroidSpawner script. 
  
 * Requirements:
-* 1. The asteroid should start with a set velocity but a random angular velocity. Both of these are set in the Rigidbody2D
+* 1. The asteroid should start with a constant speed but a random angular velocity. Both of these are set in the Rigidbody2D
+*       The movement direction of the asteroid should not change. 
 *       Hint: All movement for the asteroid should be done via a Rigidbody2D and should be able to be set at Start.
 * 2. When the asteroid is destroyed, it should spawn two smaller asteroids if it is not already the smallest size. 
 *       Hint: How can you use a function to set the AsteroidSpawner variable from a different script?
