@@ -54,21 +54,40 @@ public class AsteroidsPlayerController : MonoBehaviour
         HandleThrust();
     }
 
+    /// <summary>
+    /// Rotates the ship by pressing horizontal controls
+    /// </summary>
     private void HandleRotation()
     {
-
+        transform.Rotate(0, 0, -rotationInput * rotationSpeed * Time.deltaTime);
     }
+
+    /// <summary>
+    /// Trust forward using W key. Movement is based on physics.
+    /// </summary>
 
     private void HandleThrust()
     {
-        
+        if (thrustInput > 0)
+        {
+            rb.AddForce(transform.up * thrustInput * thrustForce);
+        }
     }
 
+    /// <summary>
+    /// When pressing Space, fire bullet
+    /// </summary>
     private void HandleFire()
     {
-
+        if (Input.GetButtonDown("Jump"))
+        {
+            FireBullet();
+        }
     }
 
+    /// <summary>
+    /// Spawn bullet
+    /// </summary>
     private void FireBullet()
     {
         if (bulletPrefab == null)
@@ -79,16 +98,25 @@ public class AsteroidsPlayerController : MonoBehaviour
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
     }
 
+    /// <summary>
+    /// Handle random teleportation from pressing left shift
+    /// </summary>
     private void HandleHyperspace()
     {
-        if (Input.GetButtonDown("Fire2"))
+        if (Input.GetButtonDown("Fire3"))
         {
             TeleportToRandomLocation();
         }
     }
 
+    /// <summary>
+    /// Teleport to random location
+    /// </summary>
     private void TeleportToRandomLocation()
     {
+        float randomX = Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight);
+        float randomY = Random.Range(ScreenBounds.ScreenTop, ScreenBounds.ScreenBottom);
 
+        transform.position = new Vector3(randomX, randomY, 0);
     }
 }
