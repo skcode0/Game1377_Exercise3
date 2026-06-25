@@ -14,6 +14,7 @@
 * 3. When the astroid hits the player, it should destroy the player. 
 */
 
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Asteroid : MonoBehaviour
@@ -22,29 +23,102 @@ public class Asteroid : MonoBehaviour
 
     [SerializeField] private AsteroidSize size;
     [SerializeField] private float speed;
+    [SerializeField] private float minRotation = 0f;
+    [SerializeField] private float maxRotation = 350f;
     [SerializeField] private float minRotationSpeed = -180f;
     [SerializeField] private float maxRotationSpeed = 180f;
 
     private Rigidbody2D rb;
     private AsteroidSpawner spawner;
-    private Vector2 velocity;
 
     void Start()
     {
-    
+        rb = GetComponent<Rigidbody2D>();
+
+        transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(minRotation, maxRotation));
+        rb.linearVelocity = transform.up * speed;
+
+        // When it's 2D rb, float is used for angular velocity
+        rb.angularVelocity = Random.Range(minRotationSpeed, maxRotationSpeed);
+
+        spawner = FindAnyObjectByType<AsteroidSpawner>();
     }
 
     void Update()
     {
+        
     }
 
+    /// <summary>
+    /// Make asteroid interact accordingly based on different collisions
+    /// </summary>
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            Destroy(collision.gameObject);
+            QuitGame();
+        }
+
+        if (collision.gameObject.CompareTag("Bullet"))
+        {
+            BreakAsteroid();
+        }
+    }
+
+    /// <summary>
+    /// Exit game.
+    /// </summary>
+    public void QuitGame()
+    {
+        #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+        #else
+                Application.Quit();
+        #endif
+    }
+
+    /// <summary>
+    /// Break asteroid to smaller pieces if applicable.
+    /// </summary>
     private void BreakAsteroid()
     {
+        switch (size)
+        {
+            case (AsteroidSize.Large):
+                SpawnChildren(AsteroidSize.Medium);
+                break;
+            case (AsteroidSize.Medium):
+                SpawnChildren(AsteroidSize.Small);
+                break;
+        }
 
+        Destroy(gameObject);
     }
 
-    private void SpawnChildren(AsteroidSize childSize)
+    /// <summary>
+    /// Sets AsteroidSpawner from a different script
+    /// </summary>
+    public void SetSpawner(AsteroidSpawner asteroidSpawner)
     {
-        
+        spawner = asteroidSpawner;
+    }
+
+    /// <summary>
+    /// Spawn x amount of smaller asteriods
+    /// </summary>
+    private void SpawnChildren(AsteroidSize childSize, int amount = 2)
+    {
+        Vector3 spawnPos = transform.position;
+        transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(minRotation, maxRotation));
+
+        for (int i = 0; i < amount; i++)
+        {
+            
+            //spawner.SpawnAsteroid(spawnPos, childSize);
+
+
+
+        }
     }
 }

@@ -15,17 +15,24 @@
 *       where the player will be (at least 3 units away from the center in any direction).
 *       Hint: Vector3.Distance can tell you how far one point is away from another. 
 */
+using System.Drawing;
 using UnityEngine;
 
 public class AsteroidSpawner : MonoBehaviour
 {
+    [SerializeField] private Asteroid largeAsteroid;
+    [SerializeField] private Asteroid mediumAsteroid;
+    [SerializeField] private Asteroid smallAsteroid;
+
+    [SerializeField] private int initialAsteroidCount = 5;
+
     // These variables determine the spawn area for the asteroids.
     // They are calculated at Start based off of the camera size. 
     private float spawnXMax = 0f;
     private float spawnXMin = 0f;
     private float spawnYMax = 0f;
     private float spawnYMin = 0f;
-    private float playerSafeDistance = 3;
+    private float playerSafeDistance = 3f;
 
     void Start()
     {
@@ -35,7 +42,7 @@ public class AsteroidSpawner : MonoBehaviour
         spawnXMin = -screenHalfWidth - playerSafeDistance;
         spawnYMax = screenHalfHeight + playerSafeDistance;
         spawnYMin = -screenHalfHeight - playerSafeDistance;
-        SpawnInitialAsteroids();
+        SpawnInitialAsteroids(initialAsteroidCount);
     }
 
     void Update()
@@ -43,13 +50,59 @@ public class AsteroidSpawner : MonoBehaviour
         
     }
 
-    private void SpawnInitialAsteroids()
+    /// <summary>
+    /// Spawn initial asteroids at random positions within boundaries but also where there's no player.
+    /// </summary>
+    private void SpawnInitialAsteroids(int amount=5)
     {
-        // Spawn initial asteroids at random positions. Ensure that they do not spawn where the player is located. 
+        for (int i = 0; i < amount; i++)
+        {
+            Vector3 spawnPos = GetValidSpawnPos();
+
+            SpawnAsteroid(spawnPos, Asteroid.AsteroidSize.Large);
+        }
     }
 
+    /// <summary>
+    /// Spawn an asteroid at the location specified by position parameter with the size specified by the size parameter.
+    /// </summary>
+    public Vector3 GetValidSpawnPos()
+    {
+        // keep getting new position as long as asteroid is with 3 units of the player (0,0,0)
+        Vector3 spawnPos;
+        do
+        {
+            float randomXpos = Random.Range(spawnXMin, spawnXMax);
+            float randomYpos = Random.Range(spawnYMin, spawnYMax);
+
+            spawnPos = new Vector3(randomXpos, randomYpos, 0);
+        } while (Vector3.Distance(spawnPos, Vector3.zero) < playerSafeDistance);
+
+        return spawnPos;
+    }
+
+    /// <summary>
+    /// Spawn an asteroid at the location specified by position parameter with the size specified by the size parameter.
+    /// </summary>
     public void SpawnAsteroid(Vector3 position, Asteroid.AsteroidSize size)
     {
-       // Spawn an asteroid at the location specified by position parameter with the size specified by the size parameter.
+        Asteroid asteroidType;
+        switch (size)
+        {
+            case Asteroid.AsteroidSize.Large:
+                asteroidType = largeAsteroid;
+                break;
+            case Asteroid.AsteroidSize.Medium:
+                asteroidType = mediumAsteroid;
+                break;
+            // for small and any other sizes, default to small
+            case Asteroid.AsteroidSize.Small:
+            default:
+                asteroidType = smallAsteroid;
+                break;
+
+        }
+
+        Instantiate(asteroidType, position, Quaternion.identity);
     }
 }

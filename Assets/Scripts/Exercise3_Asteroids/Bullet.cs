@@ -21,13 +21,25 @@ public class Bullet : MonoBehaviour
     [SerializeField] private float bulletSpeed = 20f;
     [SerializeField] private float bulletLifetime = 5f;
 
+    private Rigidbody2D rb;
+
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
+        rb.linearVelocity = transform.up * bulletSpeed;
 
+        Destroy(gameObject, bulletLifetime);
     }
 
+    /// <summary>
+    /// Destroy bullet when collided with Asteroid.
+    /// </summary>
     void OnCollisionEnter2D(Collision2D collision)
     {
-
+        if (collision.gameObject.CompareTag("Asteroid"))
+        {
+            Debug.Log("Hit: " + collision.gameObject.name);
+            Destroy(gameObject);
+        }
     }
 }
