@@ -24,7 +24,7 @@ public class Asteroid : MonoBehaviour
     [SerializeField] private AsteroidSize size;
     [SerializeField] private float speed;
     [SerializeField] private float minRotation = 0f;
-    [SerializeField] private float maxRotation = 350f;
+    [SerializeField] private float maxRotation = 360f;
     [SerializeField] private float minRotationSpeed = -180f;
     [SerializeField] private float maxRotationSpeed = 180f;
 
@@ -41,7 +41,6 @@ public class Asteroid : MonoBehaviour
         // When it's 2D rb, float is used for angular velocity
         rb.angularVelocity = Random.Range(minRotationSpeed, maxRotationSpeed);
 
-        spawner = FindAnyObjectByType<AsteroidSpawner>();
     }
 
     void Update()
@@ -49,9 +48,6 @@ public class Asteroid : MonoBehaviour
         
     }
 
-    /// <summary>
-    /// Make asteroid interact accordingly based on different collisions
-    /// </summary>
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Player"))
@@ -97,8 +93,9 @@ public class Asteroid : MonoBehaviour
     }
 
     /// <summary>
-    /// Sets AsteroidSpawner from a different script
+    /// Assigns the AsteroidSpawner reference for this asteroid instance.
     /// </summary>
+    /// <param name="asteroidSpawner">spawner responsible for creating this asteroid</param>
     public void SetSpawner(AsteroidSpawner asteroidSpawner)
     {
         spawner = asteroidSpawner;
@@ -107,18 +104,18 @@ public class Asteroid : MonoBehaviour
     /// <summary>
     /// Spawn x amount of smaller asteriods
     /// </summary>
+    /// <param name="childSize">children asteroid size</param> 
+    /// <param name="amount">number of children asteroids to spawn</param>
     private void SpawnChildren(AsteroidSize childSize, int amount = 2)
     {
         Vector3 spawnPos = transform.position;
-        transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(minRotation, maxRotation));
+        float angleOffset;
+        float angleFactor = 10;
 
         for (int i = 0; i < amount; i++)
         {
-            
-            //spawner.SpawnAsteroid(spawnPos, childSize);
-
-
-
+            angleOffset = Random.Range(minRotation/angleFactor, maxRotation/angleFactor);
+            spawner.SpawnAsteroid(spawnPos, childSize, angleOffset);
         }
     }
 }

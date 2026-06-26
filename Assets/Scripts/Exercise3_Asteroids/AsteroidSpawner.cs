@@ -53,6 +53,7 @@ public class AsteroidSpawner : MonoBehaviour
     /// <summary>
     /// Spawn initial asteroids at random positions within boundaries but also where there's no player.
     /// </summary>
+    /// <param name="amount">Number of asteroids to spawn</param>
     private void SpawnInitialAsteroids(int amount=5)
     {
         for (int i = 0; i < amount; i++)
@@ -84,7 +85,10 @@ public class AsteroidSpawner : MonoBehaviour
     /// <summary>
     /// Spawn an asteroid at the location specified by position parameter with the size specified by the size parameter.
     /// </summary>
-    public void SpawnAsteroid(Vector3 position, Asteroid.AsteroidSize size)
+    /// <param name="position">Position to spawn asteroid from</param>
+    /// <param name="size">Size of asteroid</param>
+    /// <param name="angelOffset">Angle offset for asteroid's rotation</param>
+    public void SpawnAsteroid(Vector3 position, Asteroid.AsteroidSize size, float angleOffset=0)
     {
         Asteroid asteroidType;
         switch (size)
@@ -103,6 +107,10 @@ public class AsteroidSpawner : MonoBehaviour
 
         }
 
-        Instantiate(asteroidType, position, Quaternion.identity);
+        Quaternion rotation = Quaternion.Euler(0f, 0f, angleOffset);
+        Asteroid newAsteroid =
+        Instantiate(asteroidType, position, rotation);
+
+        newAsteroid.SetSpawner(this);
     }
 }

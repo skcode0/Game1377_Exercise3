@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1199714031660810332}
   - component: {fileID: -4980407534357196545}
   - component: {fileID: -3732927969261725758}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Asteroid
   m_TagString: Asteroid
   m_Icon: {fileID: 0}
@@ -172,6 +172,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Asteroid
   size: 1
   speed: 2
+  minRotation: 0
+  maxRotation: 350
   minRotationSpeed: -180
   maxRotationSpeed: 180
 --- !u!114 &-3732927969261725758

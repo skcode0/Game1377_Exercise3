@@ -291,7 +291,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AsteroidSpawner
   largeAsteroid: {fileID: 2309046399799405609, guid: 91552452341758443a49a0520fe30970, type: 3}
-  mediumAsteroid: {fileID: 0}
+  mediumAsteroid: {fileID: -4980407534357196545, guid: 49231704176064f44ab3ec917358cd46, type: 3}
   smallAsteroid: {fileID: 8490130638211363413, guid: 3b5987f63da87b141a216d4af77cafbb, type: 3}
   initialAsteroidCount: 5
 --- !u!1 &622455421

@@ -7,6 +7,9 @@ public class ScreenWrap : MonoBehaviour
         WrapAround();
     }
 
+    /// <summary>
+    /// Wraps object out of bound to the other side
+    /// </summary>
     private void WrapAround()
     {
         Vector3 wrappedTransformPosition = transform.position;
