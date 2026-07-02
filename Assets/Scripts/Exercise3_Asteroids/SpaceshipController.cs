@@ -59,11 +59,11 @@ public class AsteroidsPlayerController : MonoBehaviour
     /// </summary>
     private void HandleRotation()
     {
-        transform.Rotate(0, 0, -rotationInput * rotationSpeed * Time.deltaTime);
+        transform.Rotate(Vector3.back, rotationInput * rotationSpeed * Time.deltaTime);
     }
 
     /// <summary>
-    /// Trust forward using W key. Movement is based on physics.
+    /// Trust forward. Movement is based on physics.
     /// </summary>
 
     private void HandleThrust()
@@ -79,7 +79,7 @@ public class AsteroidsPlayerController : MonoBehaviour
     /// </summary>
     private void HandleFire()
     {
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("FireBullet"))
         {
             FireBullet();
         }
@@ -103,7 +103,7 @@ public class AsteroidsPlayerController : MonoBehaviour
     /// </summary>
     private void HandleHyperspace()
     {
-        if (Input.GetButtonDown("Fire3"))
+        if (Input.GetButtonDown("Teleport"))
         {
             TeleportToRandomLocation();
         }
