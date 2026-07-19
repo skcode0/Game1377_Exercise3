@@ -31,6 +31,8 @@ public class Asteroid : MonoBehaviour
     private Rigidbody2D rb;
     private AsteroidSpawner spawner;
 
+    public static bool canKillPlayer = true;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -50,14 +52,15 @@ public class Asteroid : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player") && canKillPlayer)
         {
             Destroy(collision.gameObject);
+            BreakAsteroid();
 
             PlayerStats.playerLives -= 1;
             PlayerSpawner.isPlayerDead = true;
 
-            if (PlayerStats.playerLives <= 0)
+            if (PlayerSpawner.isPlayerDead && PlayerStats.playerLives <= 0)
             {
                 QuitGame();
             }
