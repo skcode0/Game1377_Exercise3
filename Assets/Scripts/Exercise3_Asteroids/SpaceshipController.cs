@@ -24,7 +24,7 @@
 
 using UnityEngine;
 
-public class AsteroidsPlayerController : MonoBehaviour
+public class SpaceshipController : MonoBehaviour
 {
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private float rotationSpeed = 360f;
@@ -36,6 +36,7 @@ public class AsteroidsPlayerController : MonoBehaviour
 
     private float rotationInput;
     private float thrustInput;
+    public static bool isThrusting = false;
 
     [SerializeField] private GameObject smokeEffect;
 
@@ -85,6 +86,11 @@ public class AsteroidsPlayerController : MonoBehaviour
         if (thrustInput > 0)
         {
             rb.AddForce(transform.up * thrustInput * thrustForce, ForceMode2D.Force);
+            isThrusting = true;
+        }
+        else
+        {
+            isThrusting = false;
         }
     }
 
