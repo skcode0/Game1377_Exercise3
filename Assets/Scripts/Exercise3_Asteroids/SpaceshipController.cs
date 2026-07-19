@@ -31,6 +31,8 @@ public class AsteroidsPlayerController : MonoBehaviour
     [SerializeField] private float thrustForce = 500f;
     [SerializeField] private Transform firePoint;
     [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private float fireCooldown = 0.5f;
+    private float nextFireTime = 0f;
 
     private float rotationInput;
     private float thrustInput;
@@ -81,6 +83,12 @@ public class AsteroidsPlayerController : MonoBehaviour
     {
         if (Input.GetButtonDown("FireBullet"))
         {
+            if (Time.time < nextFireTime)
+            {
+                return;
+            }
+
+            nextFireTime = Time.time + fireCooldown;
             FireBullet();
         }
     }
@@ -127,6 +135,6 @@ public class AsteroidsPlayerController : MonoBehaviour
         
         transform.position = newPosition;
 
-        
+
     }
 }
