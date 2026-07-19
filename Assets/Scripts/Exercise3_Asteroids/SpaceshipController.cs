@@ -47,7 +47,7 @@ public class SpaceshipController : MonoBehaviour
 
     [SerializeField] private float buffDuration = 5f;
     private float movementBuff = 1.5f;
-    private float rotationBuff = 1.5f;
+    private float rotationBuff = 1.2f;
     private float sizeBuff = 1.5f;
     private bool gotMoveBuff = false;
     private bool gotRotationBuff = false;
