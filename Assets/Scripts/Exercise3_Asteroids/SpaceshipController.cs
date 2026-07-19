@@ -23,6 +23,7 @@
  */
 
 using UnityEngine;
+using System.Collections;
 
 public class SpaceshipController : MonoBehaviour
 {
@@ -44,6 +45,12 @@ public class SpaceshipController : MonoBehaviour
     [SerializeField] private AudioClip teleportSound;
     [SerializeField] private AudioClip bulletFireSound;
 
+    [SerializeField] private float buffDuration = 5f;
+    private float movementBuff = 1.5f;
+    private float rotationBuff = 1.5f;
+    private float sizeBuff = 1.5f;
+    private bool gotMoveBuff = false;
+    private bool gotRotationBuff = false;
 
     private void Awake()
     {
@@ -74,18 +81,17 @@ public class SpaceshipController : MonoBehaviour
     /// </summary>
     private void HandleRotation()
     {
-        transform.Rotate(Vector3.back, rotationInput * rotationSpeed * Time.deltaTime);
+        transform.Rotate(Vector3.back, rotationInput * rotationSpeed * Time.deltaTime * rotationBuff);
     }
 
     /// <summary>
     /// Trust forward. Movement is based on physics.
     /// </summary>
-
     private void HandleThrust()
     {
         if (thrustInput > 0)
         {
-            rb.AddForce(transform.up * thrustInput * thrustForce, ForceMode2D.Force);
+            rb.AddForce(transform.up * thrustInput * thrustForce * movementBuff, ForceMode2D.Force);
             isThrusting = true;
         }
         else
@@ -160,7 +166,55 @@ public class SpaceshipController : MonoBehaviour
         ParticleSystem particleSystem = Instantiate(smokeEffect, transform.position, Quaternion.identity).GetComponent<ParticleSystem>();
         // destroy after duration + longest time any individual particle can stay alive after emitted
         Destroy(particleSystem.gameObject, particleSystem.main.duration + particleSystem.main.startLifetime.constantMax);
+    }
 
-        
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        GameObject other = collision.gameObject;
+
+        if (other.CompareTag("LifePowerUp"))
+        {
+            PlayerStats.playerLives++;
+        }
+        else if (other.CompareTag("MovePowerUp"))
+        {
+            StartCoroutine(MovementBuff());
+        }
+        else if (other.CompareTag("BulletPowerUp"))
+        {
+            StartCoroutine(BulletSizeBuff());
+        }
+        else
+        {
+            return;
+        }
+
+        Destroy(other);
+    }
+
+    private IEnumerator MovementBuff()
+    {
+        gotMoveBuff = true;
+        gotRotationBuff = true;
+
+        movementBuff = 1.5f;
+        rotationBuff = 1.5f;
+
+        yield return new WaitForSeconds(buffDuration);
+
+        gotMoveBuff = false;
+        gotRotationBuff = false;
+
+        movementBuff = 1f;
+        rotationBuff = 1f;
+    }
+
+    private IEnumerator BulletSizeBuff()
+    {
+        bulletPrefab.transform.localScale *= sizeBuff;
+
+        yield return new WaitForSeconds(buffDuration);
+
+        bulletPrefab.transform.localScale /= sizeBuff;
     }
 }
