@@ -39,8 +39,10 @@ public class AsteroidsPlayerController : MonoBehaviour
 
     [SerializeField] private GameObject smokeEffect;
 
-    [SerializeField] private AudioClip teleportSound;
     private AudioSource audioSource;
+    [SerializeField] private AudioClip teleportSound;
+    [SerializeField] private AudioClip bulletFireSound;
+
 
     private void Awake()
     {
@@ -100,6 +102,7 @@ public class AsteroidsPlayerController : MonoBehaviour
 
             nextFireTime = Time.time + fireCooldown;
             FireBullet();
+            
         }
     }
 
@@ -114,6 +117,7 @@ public class AsteroidsPlayerController : MonoBehaviour
             return;
         }
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        audioSource.PlayOneShot(bulletFireSound);
     }
 
     /// <summary>
@@ -144,7 +148,7 @@ public class AsteroidsPlayerController : MonoBehaviour
         } while (Physics2D.OverlapCircle(newPosition, detectRadius)); // checks for overlapping circles
         
         audioSource.PlayOneShot(teleportSound);
-        
+
         transform.position = newPosition;
         
         ParticleSystem particleSystem = Instantiate(smokeEffect, transform.position, Quaternion.identity).GetComponent<ParticleSystem>();
