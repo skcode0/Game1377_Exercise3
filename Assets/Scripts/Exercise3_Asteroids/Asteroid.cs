@@ -14,12 +14,13 @@
 * 3. When the astroid hits the player, it should destroy the player. 
 */
 
-using Unity.VisualScripting;
 using UnityEngine;
+using System.Collections;
 
 public class Asteroid : MonoBehaviour
 {
     public enum AsteroidSize { Small, Medium, Large }
+    private Collider2D asteroidCollider;
 
     [SerializeField] private AsteroidSize size;
     [SerializeField] private float speed;
@@ -33,9 +34,16 @@ public class Asteroid : MonoBehaviour
 
     public static bool canKillPlayer = true;
 
+    [SerializeField] private AudioClip explosionSound;
+
+    private Animator animator;
+    private bool isExploding = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        asteroidCollider = GetComponent<Collider2D>();
 
         transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(minRotation, maxRotation));
         rb.linearVelocity = transform.up * speed;
@@ -52,9 +60,15 @@ public class Asteroid : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (isExploding)
+        {
+            return;
+        }
+
         if (collision.gameObject.CompareTag("Player") && canKillPlayer)
         {
             Destroy(collision.gameObject);
+            PlayExplosionSound();
             BreakAsteroid();
 
             PlayerStats.playerLives -= 1;
@@ -68,9 +82,38 @@ public class Asteroid : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Bullet"))
         {
+            PlayExplosionSound();
             BreakAsteroid();
         }
     }
+
+    private void BreakAsteroid()
+    {
+        if (isExploding)
+        {
+            return;
+        }
+
+        isExploding = true;
+
+        StartCoroutine(ExplosionSequence());
+    }
+
+    /// <summary>
+    /// Play explosion sound.
+    /// </summary> 
+    private void PlayExplosionSound()
+    {
+        // Creates new game object because when the asteroid is destroyed, sound will not play
+        GameObject soundObject = new GameObject("Explosion Sound");
+        AudioSource source = soundObject.AddComponent<AudioSource>();
+
+        source.clip = explosionSound;
+        source.Play();
+
+        Destroy(soundObject, explosionSound.length);
+    }
+
 
     /// <summary>
     /// Exit game.
@@ -84,11 +127,29 @@ public class Asteroid : MonoBehaviour
         #endif
     }
 
-    /// <summary>
-    /// Break asteroid to smaller pieces if applicable.
-    /// </summary>
-    private void BreakAsteroid()
+
+    private IEnumerator ExplosionSequence()
     {
+        Vector3 explosionPosition = transform.position;
+
+        // Stop movement
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+
+        // Disable collisions during explosion
+        asteroidCollider.enabled = false;
+
+        // Play explosion animation
+        animator.SetTrigger("Explode");
+
+        // Wait for animation
+        float explosionAnimationLength = animator.GetCurrentAnimatorStateInfo(0).length;
+        yield return new WaitForSeconds(explosionAnimationLength);
+
+        // Destroy parent asteroid
+        Destroy(gameObject);
+
+        // spawn children
         switch (size)
         {
             case (AsteroidSize.Large):
@@ -99,7 +160,6 @@ public class Asteroid : MonoBehaviour
                 break;
         }
 
-        Destroy(gameObject);
     }
 
     /// <summary>
