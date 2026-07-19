@@ -114,9 +114,19 @@ public class AsteroidsPlayerController : MonoBehaviour
     /// </summary>
     private void TeleportToRandomLocation()
     {
-        float randomX = Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight);
-        float randomY = Random.Range(ScreenBounds.ScreenTop, ScreenBounds.ScreenBottom);
+        Vector3 newPosition;
+        float detectRadius = 2f;
 
-        transform.position = new Vector3(randomX, randomY, 0);
+        do
+        {
+            float randomX = Random.Range(ScreenBounds.ScreenLeft, ScreenBounds.ScreenRight);
+            float randomY = Random.Range(ScreenBounds.ScreenTop, ScreenBounds.ScreenBottom);
+
+            newPosition = new Vector3(randomX, randomY, 0);
+        } while (Physics2D.OverlapCircle(newPosition, detectRadius)); // checks for overlapping circles
+        
+        transform.position = newPosition;
+
+        
     }
 }

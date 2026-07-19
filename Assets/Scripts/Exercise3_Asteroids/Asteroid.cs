@@ -53,7 +53,14 @@ public class Asteroid : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             Destroy(collision.gameObject);
-            QuitGame();
+
+            PlayerStats.playerLives -= 1;
+            PlayerSpawner.isPlayerDead = true;
+
+            if (PlayerStats.playerLives <= 0)
+            {
+                QuitGame();
+            }
         }
 
         if (collision.gameObject.CompareTag("Bullet"))
