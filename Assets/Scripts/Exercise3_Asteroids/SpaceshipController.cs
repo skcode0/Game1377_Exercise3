@@ -51,6 +51,7 @@ public class SpaceshipController : MonoBehaviour
     private float sizeBuff = 1.5f;
     private bool gotMoveBuff = false;
     private bool gotRotationBuff = false;
+    private Animator animator;
 
     private void Awake()
     {
@@ -60,6 +61,7 @@ public class SpaceshipController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -175,6 +177,7 @@ public class SpaceshipController : MonoBehaviour
         if (other.CompareTag("LifePowerUp"))
         {
             PlayerStats.playerLives++;
+            animator.SetTrigger("AddedLife");
         }
         else if (other.CompareTag("MovePowerUp"))
         {
