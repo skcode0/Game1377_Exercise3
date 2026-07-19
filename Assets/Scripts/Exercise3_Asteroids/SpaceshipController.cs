@@ -37,6 +37,16 @@ public class AsteroidsPlayerController : MonoBehaviour
     private float rotationInput;
     private float thrustInput;
 
+    [SerializeField] private GameObject smokeEffect;
+
+    [SerializeField] private AudioClip teleportSound;
+    private AudioSource audioSource;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -133,8 +143,14 @@ public class AsteroidsPlayerController : MonoBehaviour
             newPosition = new Vector3(randomX, randomY, 0);
         } while (Physics2D.OverlapCircle(newPosition, detectRadius)); // checks for overlapping circles
         
+        audioSource.PlayOneShot(teleportSound);
+        
         transform.position = newPosition;
+        
+        ParticleSystem particleSystem = Instantiate(smokeEffect, transform.position, Quaternion.identity).GetComponent<ParticleSystem>();
+        // destroy after duration + longest time any individual particle can stay alive after emitted
+        Destroy(particleSystem.gameObject, particleSystem.main.duration + particleSystem.main.startLifetime.constantMax);
 
-
+        
     }
 }
