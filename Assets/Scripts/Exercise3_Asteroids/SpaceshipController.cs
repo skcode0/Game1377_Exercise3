@@ -46,9 +46,10 @@ public class SpaceshipController : MonoBehaviour
     [SerializeField] private AudioClip bulletFireSound;
 
     [SerializeField] private float buffDuration = 5f;
-    private float movementBuff = 1.5f;
-    private float rotationBuff = 1.2f;
-    private float sizeBuff = 1.5f;
+    private float movementBuff = 1f;
+    private float rotationBuff = 1f;
+    private float sizeBuff = 3f;
+    private bool hasBulletBuff = false;
     private bool gotMoveBuff = false;
     private bool gotRotationBuff = false;
     private Animator animator;
@@ -61,6 +62,8 @@ public class SpaceshipController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        rb.freezeRotation = true;
+
         animator = GetComponent<Animator>();
     }
 
@@ -130,7 +133,14 @@ public class SpaceshipController : MonoBehaviour
             Debug.LogWarning("Bullet prefab not assigned!");
             return;
         }
+
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+
+        if (hasBulletBuff)
+        {
+            bullet.transform.localScale *= sizeBuff;
+        }
+
         audioSource.PlayOneShot(bulletFireSound);
     }
 
@@ -174,9 +184,16 @@ public class SpaceshipController : MonoBehaviour
     {
         GameObject other = collision.gameObject;
 
+        AudioSource powerUpAudio = other.GetComponent<AudioSource>();
+        if (powerUpAudio != null)
+        {
+            powerUpAudio.Play();
+        }
+
         if (other.CompareTag("LifePowerUp"))
         {
             PlayerStats.playerLives++;
+            GameManager.Instance.DisplayPlayerLives();
             animator.SetTrigger("AddedLife");
         }
         else if (other.CompareTag("MovePowerUp"))
@@ -192,7 +209,14 @@ public class SpaceshipController : MonoBehaviour
             return;
         }
 
+        if (powerUpAudio != null && powerUpAudio.clip != null)
+        {
+            AudioSource.PlayClipAtPoint(powerUpAudio.clip, other.transform.position);
+        }
+
         Destroy(other);
+
+        PowerUpSpawner.Instance.PowerUpCollected();
     }
 
     private IEnumerator MovementBuff()
@@ -214,10 +238,10 @@ public class SpaceshipController : MonoBehaviour
 
     private IEnumerator BulletSizeBuff()
     {
-        bulletPrefab.transform.localScale *= sizeBuff;
+        hasBulletBuff = true;
 
         yield return new WaitForSeconds(buffDuration);
 
-        bulletPrefab.transform.localScale /= sizeBuff;
+        hasBulletBuff = false;
     }
 }
