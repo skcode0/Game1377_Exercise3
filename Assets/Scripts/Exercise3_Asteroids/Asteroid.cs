@@ -16,10 +16,24 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Asteroid : MonoBehaviour
 {
-    public enum AsteroidSize { Small, Medium, Large }
+    public enum AsteroidSize 
+    { 
+        Small, 
+        Medium,
+        Large
+    }
+
+    private Dictionary<AsteroidSize, int> asteroidPoints = new()
+    {
+        { AsteroidSize.Small, 100 },
+        { AsteroidSize.Medium, 50 },
+        { AsteroidSize.Large, 20 }
+    };
+    
     private Collider2D asteroidCollider;
 
     [SerializeField] private AsteroidSize size;
@@ -50,7 +64,6 @@ public class Asteroid : MonoBehaviour
 
         // When it's 2D rb, float is used for angular velocity
         rb.angularVelocity = Random.Range(minRotationSpeed, maxRotationSpeed);
-
     }
 
     void Update()
@@ -73,10 +86,11 @@ public class Asteroid : MonoBehaviour
 
             PlayerStats.playerLives -= 1;
             PlayerSpawner.isPlayerDead = true;
+            GameManager.Instance.DisplayPlayerLives();
 
             if (PlayerSpawner.isPlayerDead && PlayerStats.playerLives <= 0)
             {
-                QuitGame();
+                GameManager.Instance.QuitGame();
             }
         }
 
@@ -114,24 +128,8 @@ public class Asteroid : MonoBehaviour
         Destroy(soundObject, explosionSound.length);
     }
 
-
-    /// <summary>
-    /// Exit game.
-    /// </summary>
-    public void QuitGame()
-    {
-        #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-        #else
-                Application.Quit();
-        #endif
-    }
-
-
     private IEnumerator ExplosionSequence()
     {
-        Vector3 explosionPosition = transform.position;
-
         // Stop movement
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
@@ -149,17 +147,13 @@ public class Asteroid : MonoBehaviour
         // Destroy parent asteroid
         Destroy(gameObject);
 
-        // spawn children
-        switch (size)
-        {
-            case (AsteroidSize.Large):
-                SpawnChildren(AsteroidSize.Medium);
-                break;
-            case (AsteroidSize.Medium):
-                SpawnChildren(AsteroidSize.Small);
-                break;
-        }
+        GameManager.Instance.AddPoints(asteroidPoints[size]);
 
+        // spawn children
+        if (size > AsteroidSize.Small)
+        {
+            SpawnChildren(size - 1);
+        }
     }
 
     /// <summary>
